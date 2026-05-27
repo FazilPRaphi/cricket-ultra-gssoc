@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>CRICKET ULTRA PRO X</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -23,6 +23,7 @@ body{
   background:#020a1e;
   color:#fff;
   user-select:none;
+  touch-action:manipulation;
 }
 
 /* ========= CANVAS LAYERS ========= */
@@ -187,6 +188,25 @@ body{
   height:5px;
   background:#fff8e0;
   border-radius:3px;
+}
+
+/* WICKET LIVES DISPLAY */
+.wicket-lives{
+  display:flex;
+  gap:6px;
+  align-items:center;
+  margin-top:4px;
+}
+.wicket-dot{
+  width:10px;height:10px;
+  border-radius:50%;
+  background:#00ff88;
+  box-shadow:0 0 6px #00ff88;
+  transition:background .3s,box-shadow .3s;
+}
+.wicket-dot.lost{
+  background:#ff3355;
+  box-shadow:0 0 6px #ff3355;
 }
 
 /* ========= BOWLER ========= */
@@ -430,6 +450,16 @@ body{
   border-radius:2px;
 }
 
+/* ========= FLAG SVG ========= */
+.team-flag{
+  display:inline-block;
+  vertical-align:middle;
+  margin-right:5px;
+  border-radius:2px;
+  overflow:hidden;
+  flex-shrink:0;
+}
+
 /* ========= SCOREBOARD HUD ========= */
 .scoreboard{
   position:absolute;
@@ -448,10 +478,11 @@ body{
   backdrop-filter:blur(20px);
   z-index:1200;
   box-shadow:0 0 40px rgba(0,212,255,.12),inset 0 1px 0 rgba(255,255,255,.08);
+  gap:8px;
 }
 .hud-card{
   text-align:center;
-  min-width:90px;
+  min-width:70px;
 }
 .hud-card .label{
   font-family:'Orbitron',sans-serif;
@@ -477,21 +508,35 @@ body{
   width:1px;
   height:50px;
   background:linear-gradient(to bottom,transparent,rgba(0,212,255,.3),transparent);
+  flex-shrink:0;
+}
+.team-block{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+}
+.team-block.right-block{
+  align-items:flex-end;
 }
 .team-name{
   font-family:'Orbitron',sans-serif;
-  font-size:13px;
+  font-size:12px;
   font-weight:700;
   color:var(--neon-gold);
   text-shadow:0 0 10px rgba(255,215,0,.4);
   letter-spacing:1px;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  white-space:nowrap;
 }
 .innings-bar{
   height:4px;
   border-radius:2px;
   background:rgba(255,255,255,.1);
-  margin-top:6px;
+  margin-top:4px;
   overflow:hidden;
+  width:90px;
 }
 .innings-fill{
   height:100%;
@@ -506,19 +551,20 @@ body{
   top:14px;
   right:14px;
   display:flex;
-  gap:10px;
+  gap:8px;
   z-index:1300;
 }
 .ctrl-btn{
   font-family:'Orbitron',sans-serif;
-  font-size:11px;
+  font-size:10px;
   font-weight:700;
   letter-spacing:1px;
-  padding:10px 18px;
+  padding:9px 14px;
   border:none;
-  border-radius:12px;
+  border-radius:10px;
   cursor:pointer;
   transition:.2s;
+  white-space:nowrap;
 }
 .ctrl-btn:hover{transform:scale(1.06);}
 .btn-pause{background:rgba(0,212,255,.15);color:#00d4ff;border:1px solid rgba(0,212,255,.3);}
@@ -531,7 +577,7 @@ body{
   width:100%;
   display:flex;
   justify-content:center;
-  gap:16px;
+  gap:12px;
   z-index:1200;
   padding:0 16px;
 }
@@ -540,23 +586,25 @@ body{
   font-weight:900;
   border:none;
   cursor:pointer;
-  border-radius:16px;
+  border-radius:14px;
   transition:.18s;
   position:relative;
   overflow:hidden;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
 }
 .action-btn:hover{transform:scale(1.05);}
 .action-btn:active{transform:scale(.97);}
 .btn-start{
   font-size:15px;
-  padding:16px 36px;
+  padding:16px 32px;
   background:linear-gradient(135deg,#ffd700,#ff8c00);
   color:#000;
   box-shadow:0 0 30px rgba(255,215,0,.4);
 }
 .btn-hit{
-  font-size:14px;
-  padding:16px 28px;
+  font-size:13px;
+  padding:16px 22px;
   background:linear-gradient(135deg,#0d3b66,#1a6db5);
   color:#fff;
   border:1px solid rgba(0,212,255,.4);
@@ -578,7 +626,7 @@ body{
   bottom:100px;
   left:50%;
   transform:translateX(-50%);
-  width:320px;
+  width:min(320px, 88vw);
   z-index:1100;
   display:none;
 }
@@ -658,7 +706,7 @@ body{
   top:42%;left:50%;
   transform:translate(-50%,-50%);
   font-family:'Orbitron',sans-serif;
-  font-size:110px;
+  font-size:clamp(60px,12vw,110px);
   font-weight:900;
   opacity:0;
   z-index:1400;
@@ -679,15 +727,14 @@ body{
   bottom:82px;
   left:50%;
   transform:translateX(-50%);
-  width:88%;
-  max-width:800px;
+  width:min(88%, 800px);
   padding:10px 24px;
   border-radius:14px;
   background:var(--glass-bg);
   border:1px solid var(--glass-border2);
   text-align:center;
   font-family:'Rajdhani',sans-serif;
-  font-size:20px;
+  font-size:clamp(14px,2.5vw,20px);
   font-weight:600;
   color:var(--neon-gold);
   z-index:1100;
@@ -713,6 +760,7 @@ body{
   color:#ff3355;
   z-index:1100;
   display:none;
+  white-space:nowrap;
 }
 
 /* ========= PARTICLES ========= */
@@ -756,40 +804,45 @@ body{
   align-items:center;
   z-index:9000;
   backdrop-filter:blur(12px);
+  padding:20px;
 }
 .result-title{
   font-family:'Orbitron',sans-serif;
-  font-size:80px;
+  font-size:clamp(36px,8vw,80px);
   font-weight:900;
   margin-bottom:16px;
   text-shadow:0 0 60px currentColor;
   animation:resultPop .8s ease;
+  text-align:center;
 }
 @keyframes resultPop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
 .result-won{color:var(--neon-gold);}
 .result-lost{color:var(--neon-red);}
 .result-detail{
   font-family:'Rajdhani',sans-serif;
-  font-size:28px;
+  font-size:clamp(16px,3vw,28px);
   color:rgba(255,255,255,.7);
   margin-bottom:12px;
   letter-spacing:1px;
+  text-align:center;
 }
 .result-stats{
-  display:flex;gap:40px;
+  display:flex;gap:clamp(16px,4vw,40px);
   margin:20px 0 40px;
+  flex-wrap:wrap;
+  justify-content:center;
 }
 .result-stat{
   text-align:center;
 }
 .result-stat .r-val{
   font-family:'Orbitron',sans-serif;
-  font-size:40px;
+  font-size:clamp(24px,5vw,40px);
   font-weight:900;
   color:#fff;
 }
 .result-stat .r-lbl{
-  font-size:13px;
+  font-size:11px;
   letter-spacing:2px;
   color:rgba(255,255,255,.4);
   margin-top:4px;
@@ -819,10 +872,11 @@ body{
   justify-content:center;
   align-items:center;
   z-index:8000;
+  padding:20px;
 }
 .intro-logo{
   font-family:'Orbitron',sans-serif;
-  font-size:22px;
+  font-size:clamp(14px,3vw,22px);
   font-weight:900;
   letter-spacing:8px;
   color:var(--neon-blue);
@@ -833,7 +887,7 @@ body{
 @keyframes introPulse{from{opacity:.7}to{opacity:1}}
 .intro-title{
   font-family:'Orbitron',sans-serif;
-  font-size:64px;
+  font-size:clamp(36px,9vw,64px);
   font-weight:900;
   background:linear-gradient(135deg,#ffd700,#ff8c00,#ffd700);
   -webkit-background-clip:text;
@@ -846,44 +900,50 @@ body{
 @keyframes introTitle{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
 .intro-sub{
   font-family:'Rajdhani',sans-serif;
-  font-size:18px;
+  font-size:clamp(12px,2.5vw,18px);
   letter-spacing:4px;
   color:rgba(255,255,255,.4);
-  margin-bottom:60px;
+  margin-bottom:40px;
 }
 .intro-vs{
-  display:flex;align-items:center;gap:32px;
-  margin-bottom:50px;
+  display:flex;align-items:center;gap:clamp(14px,4vw,32px);
+  margin-bottom:30px;
+  flex-wrap:wrap;
+  justify-content:center;
 }
 .intro-team{
   font-family:'Orbitron',sans-serif;
-  font-size:24px;
+  font-size:clamp(14px,3.5vw,24px);
   font-weight:900;
-  padding:16px 32px;
+  padding:clamp(10px,2vw,16px) clamp(16px,4vw,32px);
   border-radius:16px;
   border:1px solid rgba(255,215,0,.3);
   background:rgba(255,215,0,.08);
   color:#ffd700;
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
 .intro-vs-text{
   font-family:'Orbitron',sans-serif;
-  font-size:32px;
+  font-size:clamp(20px,5vw,32px);
   font-weight:900;
   color:rgba(255,255,255,.3);
 }
 .intro-info{
   font-family:'Rajdhani',sans-serif;
-  font-size:16px;
+  font-size:clamp(12px,2.5vw,16px);
   color:rgba(255,255,255,.4);
   letter-spacing:2px;
-  margin-bottom:40px;
+  margin-bottom:30px;
+  text-align:center;
 }
 .intro-btn{
   font-family:'Orbitron',sans-serif;
-  font-size:16px;
+  font-size:clamp(13px,2.5vw,16px);
   font-weight:900;
   letter-spacing:2px;
-  padding:18px 56px;
+  padding:clamp(14px,2.5vw,18px) clamp(36px,6vw,56px);
   border:none;
   border-radius:18px;
   cursor:pointer;
@@ -912,7 +972,7 @@ body{
 }
 .pause-text{
   font-family:'Orbitron',sans-serif;
-  font-size:60px;
+  font-size:clamp(32px,7vw,60px);
   font-weight:900;
   color:var(--neon-blue);
   text-shadow:0 0 40px rgba(0,212,255,.6);
@@ -941,7 +1001,7 @@ body{
   font-family:'Orbitron',sans-serif;
   font-size:11px;
   letter-spacing:1px;
-  padding:8px 16px;
+  padding:8px 14px;
   border-radius:12px;
   background:var(--glass-bg);
   border:1px solid var(--glass-border);
@@ -950,11 +1010,12 @@ body{
   text-align:center;
 }
 .speed-val{
-  font-size:22px;
+  font-size:20px;
   font-weight:900;
   display:block;
   color:#fff;
   margin-top:2px;
+  white-space:nowrap;
 }
 
 /* ========= KEYS HINT ========= */
@@ -1033,6 +1094,7 @@ body{
   color:rgba(255,215,0,.7);
   z-index:1100;
   text-align:center;
+  white-space:nowrap;
 }
 .rrr-val{
   font-size:18px;
@@ -1040,6 +1102,42 @@ body{
   color:#ffd700;
   display:block;
   margin-top:2px;
+}
+
+/* ========= RESPONSIVE OVERRIDES ========= */
+@media (max-width:700px){
+  .scoreboard{
+    padding:8px 10px;
+    border-radius:12px;
+    width:99%;
+    max-width:99vw;
+    flex-wrap:wrap;
+    gap:6px;
+    top:8px;
+  }
+  .hud-divider{ display:none !important; }
+  .hud-card .value{ font-size:18px; }
+  .hud-card .label{ font-size:7px; }
+  .hud-card{ min-width:52px; }
+  .team-block{ display:none; }
+  .top-controls{ top:8px; right:8px; gap:5px; }
+  .ctrl-btn{ font-size:9px; padding:7px 10px; }
+  .run-rate-bar,.speed-meter,.rrr-bar,.difficulty-badge{ display:none !important; }
+  .keys-hint{ display:none; }
+  .commentary-bar{ font-size:13px; padding:8px 12px; bottom:72px; }
+  .action-controls{ bottom:12px; gap:8px; padding:0 10px; }
+  .btn-start{ font-size:13px; padding:13px 22px; }
+  .btn-hit{ font-size:12px; padding:13px 16px; }
+}
+@media (min-width:701px) and (max-width:1024px){
+  .scoreboard{ padding:10px 16px; }
+  .hud-card .value{ font-size:22px; }
+  .team-name{ font-size:11px; }
+  .run-rate-bar,.speed-meter,.rrr-bar{ display:block; }
+}
+@media (max-height:600px){
+  .commentary-bar{ display:none; }
+  .difficulty-badge{ display:none !important; }
 }
 </style>
 </head>
@@ -1123,9 +1221,44 @@ body{
 
   <!-- SCOREBOARD -->
   <div class="scoreboard">
-    <div>
-      <div class="team-name" id="battingTeam"><span style="font-size:20px;vertical-align:middle;">🇮🇳</span> INDIA</div>
-      <div class="innings-bar" style="width:100px;"><div class="innings-fill" id="inningsFill" style="width:0%"></div></div>
+    <div class="team-block">
+      <div class="team-name" id="battingTeam">
+        <!-- India Flag SVG -->
+        <svg class="team-flag" width="28" height="18" viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg">
+          <rect width="900" height="200" y="0" fill="#FF9933"/>
+          <rect width="900" height="200" y="200" fill="#FFFFFF"/>
+          <rect width="900" height="200" y="400" fill="#138808"/>
+          <circle cx="450" cy="300" r="60" fill="none" stroke="#000080" stroke-width="6"/>
+          <g fill="#000080">
+            <circle cx="450" cy="240" r="5"/>
+            <circle cx="474" cy="245" r="5"/>
+            <circle cx="495" cy="258" r="5"/>
+            <circle cx="509" cy="278" r="5"/>
+            <circle cx="515" cy="300" r="5"/>
+            <circle cx="509" cy="322" r="5"/>
+            <circle cx="495" cy="342" r="5"/>
+            <circle cx="474" cy="355" r="5"/>
+            <circle cx="450" cy="360" r="5"/>
+            <circle cx="426" cy="355" r="5"/>
+            <circle cx="405" cy="342" r="5"/>
+            <circle cx="391" cy="322" r="5"/>
+            <circle cx="385" cy="300" r="5"/>
+            <circle cx="391" cy="278" r="5"/>
+            <circle cx="405" cy="258" r="5"/>
+            <circle cx="426" cy="245" r="5"/>
+          </g>
+          <circle cx="450" cy="300" r="18" fill="#000080"/>
+          <line x1="450" y1="300" x2="450" y2="242" stroke="#000080" stroke-width="3"/>
+          <line x1="450" y1="300" x2="498" y2="271" stroke="#000080" stroke-width="2"/>
+          <line x1="450" y1="300" x2="402" y2="271" stroke="#000080" stroke-width="2"/>
+        </svg>
+        INDIA
+      </div>
+      <div class="innings-bar" style="width:90px;"><div class="innings-fill" id="inningsFill" style="width:0%"></div></div>
+      <div class="wicket-lives" id="wicketLives">
+        <div class="wicket-dot" id="wd0"></div>
+        <div class="wicket-dot" id="wd1"></div>
+      </div>
     </div>
     <div class="hud-divider"></div>
     <div class="hud-card">
@@ -1144,12 +1277,22 @@ body{
     </div>
     <div class="hud-divider"></div>
     <div class="hud-card">
-      <div class="label">BALLS LEFT</div>
+      <div class="label">BALLS</div>
       <div class="value" id="ballsLeftDisplay">30</div>
     </div>
     <div class="hud-divider"></div>
-    <div>
-      <div class="team-name" id="bowlingTeam" style="text-align:right"><span style="font-size:20px;vertical-align:middle;">🏴</span> ENGLAND</div>
+    <div class="team-block right-block">
+      <div class="team-name" id="bowlingTeam" style="flex-direction:row-reverse;">
+        <!-- England Flag SVG -->
+        <svg class="team-flag" width="28" height="18" viewBox="0 0 60 36" xmlns="http://www.w3.org/2000/svg">
+          <rect width="60" height="36" fill="#012169"/>
+          <path d="M0,0 L60,36 M60,0 L0,36" stroke="#fff" stroke-width="6"/>
+          <path d="M0,0 L60,36 M60,0 L0,36" stroke="#C8102E" stroke-width="4"/>
+          <path d="M30,0 V36 M0,18 H60" stroke="#fff" stroke-width="10"/>
+          <path d="M30,0 V36 M0,18 H60" stroke="#C8102E" stroke-width="6"/>
+        </svg>
+        ENGLAND
+      </div>
     </div>
   </div>
 
@@ -1230,11 +1373,38 @@ body{
     <div class="intro-title">PRO X</div>
     <div class="intro-sub">ARCADE CRICKET EXPERIENCE</div>
     <div class="intro-vs">
-      <div class="intro-team">🇮🇳 INDIA</div>
+      <div class="intro-team">
+        <svg width="32" height="21" viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg" style="border-radius:2px;flex-shrink:0;">
+          <rect width="900" height="200" y="0" fill="#FF9933"/>
+          <rect width="900" height="200" y="200" fill="#FFFFFF"/>
+          <rect width="900" height="200" y="400" fill="#138808"/>
+          <circle cx="450" cy="300" r="60" fill="none" stroke="#000080" stroke-width="6"/>
+          <g fill="#000080">
+            <circle cx="450" cy="240" r="5"/><circle cx="474" cy="245" r="5"/><circle cx="495" cy="258" r="5"/>
+            <circle cx="509" cy="278" r="5"/><circle cx="515" cy="300" r="5"/><circle cx="509" cy="322" r="5"/>
+            <circle cx="495" cy="342" r="5"/><circle cx="474" cy="355" r="5"/><circle cx="450" cy="360" r="5"/>
+            <circle cx="426" cy="355" r="5"/><circle cx="405" cy="342" r="5"/><circle cx="391" cy="322" r="5"/>
+            <circle cx="385" cy="300" r="5"/><circle cx="391" cy="278" r="5"/><circle cx="405" cy="258" r="5"/>
+            <circle cx="426" cy="245" r="5"/>
+          </g>
+          <circle cx="450" cy="300" r="18" fill="#000080"/>
+          <line x1="450" y1="300" x2="450" y2="242" stroke="#000080" stroke-width="3"/>
+        </svg>
+        INDIA
+      </div>
       <div class="intro-vs-text">VS</div>
-      <div class="intro-team">🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENGLAND</div>
+      <div class="intro-team">
+        <svg width="32" height="21" viewBox="0 0 60 36" xmlns="http://www.w3.org/2000/svg" style="border-radius:2px;flex-shrink:0;">
+          <rect width="60" height="36" fill="#012169"/>
+          <path d="M0,0 L60,36 M60,0 L0,36" stroke="#fff" stroke-width="6"/>
+          <path d="M0,0 L60,36 M60,0 L0,36" stroke="#C8102E" stroke-width="4"/>
+          <path d="M30,0 V36 M0,18 H60" stroke="#fff" stroke-width="10"/>
+          <path d="M30,0 V36 M0,18 H60" stroke="#C8102E" stroke-width="6"/>
+        </svg>
+        ENGLAND
+      </div>
     </div>
-    <div class="intro-info">5 OVERS · TARGET CHASE · ARCADE MODE</div>
+    <div class="intro-info">5 OVERS · TARGET CHASE · 2 WICKETS</div>
     <button class="intro-btn" onclick="beginGame()">▶ PLAY NOW</button>
   </div>
 </div>
@@ -1244,9 +1414,11 @@ body{
    CRICKET ULTRA PRO X — FULL GAME ENGINE
 ============================================================ */
 
-/* ----- STATE ----- */
-
+/* ----- CONSTANTS ----- */
 const TOTAL_BALLS = 30;
+const MAX_WICKETS = 2; // 2 wickets allowed
+
+/* ----- STATE ----- */
 let score = 0, wickets = 0, ballsPlayed = 0;
 let sixes = 0, fours = 0;
 let playing = false, paused = false, over = false;
@@ -1256,11 +1428,9 @@ let countdownTimer = null, bowlTimer = null;
 let difficulty = 1;
 let ballAnimId = null;
 let ballX = 0, ballY = 0, ballVX = 0, ballVY = 0;
-let ballPhase = 'idle'; // idle, flying, hit
-let ballSize = 18;
 
-// Target now decrements from 70 to 20 (random between 20 and 70)
-const target = Math.floor(Math.random() * 51) + 20; // 20–70
+/* Proper cricket target: realistic range 20–70 */
+const target = Math.floor(Math.random() * 51) + 20;
 
 /* ----- DOM REFS ----- */
 const ballEl = document.getElementById('ball');
@@ -1279,8 +1449,18 @@ const startBtn = document.getElementById('startBtn');
 const pauseOverlay = document.getElementById('pauseOverlay');
 const gc = document.getElementById('gameContainer');
 
-/* ----- INIT: TARGET ----- */
+/* ----- INIT ----- */
 document.getElementById('targetDisplay').innerText = target;
+
+/* ============================================================
+   WICKET LIVES UI
+============================================================ */
+function updateWicketLives() {
+  for (let i = 0; i < MAX_WICKETS; i++) {
+    const dot = document.getElementById('wd' + i);
+    if (dot) dot.classList.toggle('lost', i < wickets);
+  }
+}
 
 /* ============================================================
    BUILD ENVIRONMENT
@@ -1304,11 +1484,9 @@ function buildFloodlights() {
     b.className = 'floodlight-beam';
     b.style.cssText = `left:${pos}%;transform:rotate(${pos < 50 ? (pos - 11) : (pos - 86)}deg);`;
     fl.appendChild(b);
-    // Light pole
     const pole = document.createElement('div');
     pole.style.cssText = `position:absolute;left:${pos}%;top:0;width:3px;height:80px;background:rgba(255,255,200,.15);transform:translateX(-50%);`;
     fl.appendChild(pole);
-    // Floodlight head
     const head = document.createElement('div');
     head.style.cssText = `position:absolute;left:calc(${pos}% - 12px);top:74px;width:24px;height:8px;background:rgba(255,255,180,.4);border-radius:3px;box-shadow:0 0 12px rgba(255,255,180,.5);`;
     fl.appendChild(head);
@@ -1329,7 +1507,6 @@ function buildCrowd() {
       const col = colors[Math.floor(Math.random() * colors.length)];
       p.style.cssText = `left:${(i / count) * 100}%;height:${h}px;background:${col};--sd:${0.6+Math.random()*1.2}s;animation-delay:${Math.random()*1.5}s;`;
       tierEl.appendChild(p);
-      // Camera flash
       if (Math.random() < 0.08) {
         const flash = document.createElement('div');
         flash.className = 'camera-flash';
@@ -1368,7 +1545,7 @@ function startMatch() {
 
 function scheduleNextBall(delay = 1500) {
   if (!playing || over || paused) return;
-  if (ballsPlayed >= TOTAL_BALLS || wickets >= 2) { finishGame(); return; }
+  if (ballsPlayed >= TOTAL_BALLS || wickets >= MAX_WICKETS) { finishGame(); return; }
   if (score >= target) { finishGame(); return; }
   clearTimeout(bowlTimer);
   bowlTimer = setTimeout(() => {
@@ -1403,23 +1580,19 @@ function launchBall() {
   if (!playing || over || ballInFlight) return;
   ballInFlight = true;
 
-  // Difficulty scales speed
   const speedBase = 120 + difficulty * 18;
   const ballSpeed = Math.floor(speedBase + Math.random() * 30);
   document.getElementById('speedDisplay').innerText = ballSpeed + ' km/h';
 
-  // Swing — random left/right offset
   const swingX = (Math.random() - 0.5) * 80;
 
-  // Physics initial conditions
-  const gc = document.getElementById('gameContainer');
   const W = gc.offsetWidth, H = gc.offsetHeight;
   const centerX = W / 2;
 
   ballX = centerX;
   ballY = 330;
   const targetX = centerX + swingX;
-  const targetY = H - 160; // batsman zone
+  const targetY = H - 160;
   const frames = Math.max(40, Math.floor(3000 / (ballSpeed * 0.5)));
 
   ballVX = (targetX - ballX) / frames;
@@ -1430,7 +1603,6 @@ function launchBall() {
   const bounceFrame = Math.floor(frames * 0.55);
   timingStart = Date.now();
 
-  // Show timing bar
   timingContainer.style.display = 'block';
   timingResultLabel.textContent = '';
   timingIndicator.style.animation = 'none';
@@ -1449,16 +1621,13 @@ function launchBall() {
     ballX += ballVX;
     ballY += ballVY;
 
-    // Swing drift
     const driftProgress = frame / frames;
     ballX += swingX * 0.012 * Math.sin(driftProgress * Math.PI);
 
-    // Bounce effect
     if (bounced && frame === bounceFrame) {
       ballVY *= -0.45;
     }
 
-    // Size grows as ball approaches
     const progress = Math.min(frame / frames, 1);
     const size = 10 + progress * 14;
     ballEl.style.width = size + 'px';
@@ -1466,7 +1635,6 @@ function launchBall() {
     ballEl.style.left = (ballX - size / 2) + 'px';
     ballEl.style.top = (ballY - size / 2) + 'px';
 
-    // Missed — ball past batsman
     if (ballY > H - 80) {
       cancelAnimationFrame(ballAnimId);
       ballInFlight = false;
@@ -1492,10 +1660,8 @@ function executeShot(dir) {
   ballInFlight = false;
   timingContainer.style.display = 'none';
 
-  // Timing calculation
   const elapsed = Date.now() - timingStart;
-  const gcW = gc.offsetWidth;
-  const totalTime = (timingIndicator.style.getPropertyValue('--speed') || '1500ms').replace('ms', '') * 1;
+  const totalTime = parseFloat((timingIndicator.style.getPropertyValue('--speed') || '1500ms').replace('ms', ''));
   const pct = Math.min(elapsed / totalTime, 1);
   let timing;
   if (pct >= 0.38 && pct <= 0.62) timing = 'perfect';
@@ -1508,51 +1674,30 @@ function executeShot(dir) {
   timingContainer.style.display = 'block';
   setTimeout(() => { timingContainer.style.display = 'none'; }, 900);
 
-  // Bat animation
   batsmanEl.classList.add(dir === 'left' ? 'swing-left' : 'swing-right');
   setTimeout(() => batsmanEl.classList.remove('swing-left', 'swing-right'), 200);
 
-  // ============ PROBABILITY ENGINE ============
-  // Base probabilities
   let roll = Math.random();
-
-  // Timing modifies probs
-  let wicketChance = 0.10;
-  let dotChance = 0.20;
-  let fieldStopChance = 0.15;
-  // runs = 0.55 base
+  let wicketChance = 0.10, dotChance = 0.20, fieldStopChance = 0.15;
 
   if (timing === 'perfect') {
-    wicketChance = 0.02;
-    dotChance = 0.06;
-    fieldStopChance = 0.07;
+    wicketChance = 0.02; dotChance = 0.06; fieldStopChance = 0.07;
   } else if (timing === 'early') {
-    wicketChance = 0.12;
-    dotChance = 0.22;
-    fieldStopChance = 0.18;
-  } else { // late
-    wicketChance = 0.16;
-    dotChance = 0.25;
-    fieldStopChance = 0.18;
+    wicketChance = 0.12; dotChance = 0.22; fieldStopChance = 0.18;
+  } else {
+    wicketChance = 0.16; dotChance = 0.25; fieldStopChance = 0.18;
   }
 
-  // Difficulty bump
   wicketChance = Math.min(wicketChance + (difficulty - 1) * 0.02, 0.22);
-
   const total = wicketChance + dotChance + fieldStopChance;
-  // remainder is runs
 
   if (roll < wicketChance) {
-    // OUT
     doWicket(timing);
   } else if (roll < wicketChance + dotChance) {
-    // DOT
     doDot(dir, timing);
   } else if (roll < total) {
-    // FIELD STOP
     doFieldStop(dir, timing);
   } else {
-    // RUNS
     doRuns(dir, timing);
   }
 
@@ -1565,13 +1710,17 @@ function executeShot(dir) {
 function handleMissed() {
   ballsPlayed++;
   wickets++;
+  updateWicketLives();
   updateUI();
   setCommentary('💀 MISSED! BOWLED OUT!');
   showBigText('OUT', '#ff3355');
   explodeStumps();
   screenShake('big');
   flashScreen('#ff0033', 0.4);
-  if (wickets >= 2 || ballsPlayed >= TOTAL_BALLS || score >= target) { setTimeout(finishGame, 1800); return; }
+  if (wickets >= MAX_WICKETS || ballsPlayed >= TOTAL_BALLS || score >= target) {
+    setTimeout(finishGame, 1800);
+    return;
+  }
   scheduleNextBall(2800);
 }
 
@@ -1580,14 +1729,16 @@ function handleMissed() {
 ============================================================ */
 function doWicket(timing) {
   wickets++;
+  updateWicketLives();
   const types = ['CAUGHT!', 'LBW!', 'BOWLED!', 'STUMPED!'];
   const type = timing === 'late' ? 'BOWLED!' : types[Math.floor(Math.random() * types.length)];
-  setCommentary('💀 ' + type + ' — HE\'S OUT!');
+  const remaining = MAX_WICKETS - wickets;
+  setCommentary('💀 ' + type + (remaining > 0 ? ` — ${remaining} WICKET${remaining>1?'S':''} LEFT!` : ' — ALL OUT!'));
   showBigText('OUT', '#ff3355');
   explodeStumps();
   screenShake('big');
   flashScreen('#ff0033', 0.35);
-  if (wickets >= 2) setTimeout(finishGame, 1800);
+  if (wickets >= MAX_WICKETS) setTimeout(finishGame, 1800);
 }
 
 function doDot(dir, timing) {
@@ -1637,7 +1788,7 @@ function doRuns(dir, timing) {
     else if (r < 0.42) runs = 3;
     else if (r < 0.70) runs = 2;
     else runs = 1;
-  } else { // late
+  } else {
     if (r < 0.05) runs = 6;
     else if (r < 0.15) runs = 4;
     else if (r < 0.30) runs = 3;
@@ -1679,8 +1830,7 @@ function doRuns(dir, timing) {
    BALL ANIMATIONS
 ============================================================ */
 function animateShotTrajectory(dir, runs, timing) {
-  const W = gc.offsetWidth;
-  const H = gc.offsetHeight;
+  const W = gc.offsetWidth, H = gc.offsetHeight;
   const dX = dir === 'left' ? -(W * (runs >= 4 ? 0.5 : 0.3)) : (W * (runs >= 4 ? 0.5 : 0.3));
   const dY = runs === 6 ? -(H * 0.6) : runs === 4 ? -(H * 0.35) : -(H * 0.2);
   const dur = runs >= 4 ? 900 : 600;
@@ -1707,7 +1857,6 @@ function animateBallFieldStop(dir) {
   const W = gc.offsetWidth, H = gc.offsetHeight;
   const dX = dir === 'left' ? -(W * 0.18) : (W * 0.18);
   const startL = parseFloat(ballEl.style.left) || W / 2;
-  const startT = parseFloat(ballEl.style.top) || H - 200;
   let t = 0;
   const iv = setInterval(() => {
     t++;
@@ -1742,7 +1891,6 @@ function moveFielderToward(bx, by) {
   fEl.style.top = Math.max(45, Math.min(80, ty)) + '%';
   setTimeout(() => {
     fEl.classList.remove('running');
-    // Return to original position
     setTimeout(() => {
       fEl.style.left = fEl.dataset.origLeft || fEl.style.left;
     }, 3000);
@@ -1780,7 +1928,7 @@ function flashScreen(color, opacity) {
   style.textContent = '@keyframes flashFade{from{opacity:' + opacity + '}to{opacity:0}}';
   gc.appendChild(style);
   gc.appendChild(fl);
-  setTimeout(() => { gc.removeChild(fl); gc.removeChild(style); }, 600);
+  setTimeout(() => { gc.contains(fl) && gc.removeChild(fl); gc.contains(style) && gc.removeChild(style); }, 600);
 }
 
 function explodeStumps() {
@@ -1791,7 +1939,7 @@ function explodeStumps() {
     s.className = 'stump-fly';
     s.style.cssText = `left:${x}px;top:${gH - 160}px;height:40px;--sx:${(i-1)*50 + (Math.random()-0.5)*30}px;--sy:${-80 - Math.random()*60}px;--sr:${(Math.random()-0.5)*360}deg;--sfd:${0.8+Math.random()*0.6}s;`;
     gc.appendChild(s);
-    setTimeout(() => gc.removeChild(s), 1500);
+    setTimeout(() => gc.contains(s) && gc.removeChild(s), 1500);
   });
 }
 
@@ -1831,12 +1979,10 @@ function launchFireworks() {
       }
     }, fw * 180);
   }
-  // Extra screen flash
   flashScreen('#ff6fff', 0.15);
 }
 
 function crowdReact(type) {
-  // Brief crowd surge visual
   const container = document.getElementById('crowdContainer');
   const persons = container.querySelectorAll('.crowd-person');
   persons.forEach(p => {
@@ -1853,20 +1999,17 @@ function updateUI() {
   document.getElementById('oversDisplay').innerText = `${Math.floor(ballsPlayed/6)}.${ballsPlayed%6}`;
   document.getElementById('ballsLeftDisplay').innerText = (TOTAL_BALLS - ballsPlayed);
 
-  // Animate score
-  document.getElementById('scoreDisplay').classList.remove('pop');
-  void document.getElementById('scoreDisplay').offsetWidth;
-  document.getElementById('scoreDisplay').classList.add('pop');
+  const scoreEl = document.getElementById('scoreDisplay');
+  scoreEl.classList.remove('pop');
+  void scoreEl.offsetWidth;
+  scoreEl.classList.add('pop');
 
-  // Innings fill
   const pct = Math.min((score / target) * 100, 100);
   document.getElementById('inningsFill').style.width = pct + '%';
 
-  // Run rate
   const rr = ballsPlayed > 0 ? ((score / ballsPlayed) * 6).toFixed(2) : '0.00';
   document.getElementById('rrDisplay').innerText = rr;
 
-  // Required run rate
   const ballsLeft = TOTAL_BALLS - ballsPlayed;
   const needed = target - score;
   if (ballsLeft > 0 && needed > 0) {
@@ -1876,34 +2019,11 @@ function updateUI() {
     document.getElementById('rrrDisplay').innerText = '—';
   }
 
-  // Difficulty
   difficulty = 1 + Math.floor(ballsPlayed / 10);
   const levels = ['⚡ LEVEL 1','🔥 LEVEL 2','💥 LEVEL 3'];
   document.getElementById('diffBadge').innerText = levels[Math.min(difficulty - 1, 2)];
   timingSpeed = Math.max(900, 1500 - (difficulty - 1) * 200);
-
-  // Responsive: adjust for mobile
-  if (window.innerWidth < 700) {
-    document.querySelector('.scoreboard').style.fontSize = '12px';
-    document.querySelector('.scoreboard').style.padding = '8px 4px';
-    document.querySelector('.scoreboard').style.borderRadius = '10px';
-    document.querySelector('.scoreboard').style.width = '99%';
-    document.querySelector('.scoreboard').style.maxWidth = '99vw';
-    document.querySelector('.scoreboard').style.flexDirection = 'column';
-    document.querySelector('.scoreboard').style.alignItems = 'stretch';
-    document.querySelectorAll('.hud-divider').forEach(e => e.style.display = 'none');
-  } else {
-    document.querySelector('.scoreboard').style.fontSize = '';
-    document.querySelector('.scoreboard').style.padding = '';
-    document.querySelector('.scoreboard').style.borderRadius = '';
-    document.querySelector('.scoreboard').style.width = '';
-    document.querySelector('.scoreboard').style.maxWidth = '';
-    document.querySelector('.scoreboard').style.flexDirection = '';
-    document.querySelector('.scoreboard').style.alignItems = '';
-    document.querySelectorAll('.hud-divider').forEach(e => e.style.display = '');
-  }
 }
-
 
 /* ============================================================
    PAUSE / RESTART
@@ -1913,7 +2033,7 @@ function togglePause() {
   paused = !paused;
   document.getElementById('pauseBtn').textContent = paused ? '▶ RESUME' : '⏸ PAUSE';
   pauseOverlay.style.display = paused ? 'flex' : 'none';
-  if (!paused && !ballInFlight && !countdownEl.style.display === 'block') {
+  if (!paused && !ballInFlight) {
     scheduleNextBall(800);
   }
 }
@@ -1939,7 +2059,8 @@ function finishGame() {
 
   const details = won
     ? ['INCREDIBLE INNINGS!', 'BRILLIANT CHASE!', 'OUTSTANDING PERFORMANCE!']
-    : ['BETTER LUCK NEXT TIME', 'THE BOWLERS GOT YOU', 'TOUGH DAY AT THE CREASE'];
+    : (wickets >= MAX_WICKETS ? ['ALL WICKETS LOST!', 'THE BOWLERS GOT YOU', 'TOUGH DAY AT THE CREASE']
+                              : ['RAN OUT OF BALLS!', 'SO CLOSE, YET SO FAR', 'BETTER LUCK NEXT TIME']);
   document.getElementById('resultDetail').textContent = details[Math.floor(Math.random() * details.length)];
 
   document.getElementById('rsFinalScore').textContent = `${score}/${wickets}`;
@@ -1948,7 +2069,7 @@ function finishGame() {
   document.getElementById('rsSixes').textContent = sixes;
   document.getElementById('rsFours').textContent = fours;
 
-  if (won) { launchFireworks(); launchFireworks(); }
+  if (won) { launchFireworks(); setTimeout(launchFireworks, 400); }
 }
 
 /* ============================================================
@@ -1959,6 +2080,12 @@ window.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight') { e.preventDefault(); hitRight(); }
   if (e.code === 'Space') { e.preventDefault(); togglePause(); }
 });
+
+/* ============================================================
+   TOUCH SUPPORT
+============================================================ */
+document.getElementById('hitLeftBtn').addEventListener('touchstart', e => { e.preventDefault(); hitLeft(); }, {passive:false});
+document.getElementById('hitRightBtn').addEventListener('touchstart', e => { e.preventDefault(); hitRight(); }, {passive:false});
 
 /* ============================================================
    STORE FIELDER ORIGINAL POSITIONS
